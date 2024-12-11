@@ -19,6 +19,7 @@ namespace SQL_Kayıt_Formu_Yeni
         }
         static string constring = "Data Source=DESKTOP-LATR9CC\\SQLEXPRESS;Initial Catalog=eyyubıxkayit;Integrated Security=True";
         SqlConnection connect = new SqlConnection(constring);
+        SqlCommand komut = new SqlCommand(constring);
 
         public void verilerigoster(string veriler)
         {
@@ -28,6 +29,11 @@ namespace SQL_Kayıt_Formu_Yeni
             dataGridView1.DataSource = ds.Tables[0];
         }
 
+        public void verileriSil(string veriler)
+        {
+            string sorgu = "DELETE * FROM eyyubixkisiler WHERE tc=@tc";
+            komut = new SqlCommand(sorgu, connect);
+        }
 
         private void button1_Click(object sender, EventArgs e)
         {
@@ -36,7 +42,7 @@ namespace SQL_Kayıt_Formu_Yeni
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            
+
         }
 
         private void label3_Click(object sender, EventArgs e)
@@ -80,9 +86,9 @@ namespace SQL_Kayıt_Formu_Yeni
             txt_ad.Focus();
         }
 
-        private void button3_Click(object sender, EventArgs e)
+        private void Button3_Click(object sender, EventArgs e)
         {
-            
+
         }
 
         private void txt_basvurusil_TextChanged(object sender, EventArgs e)
@@ -98,6 +104,58 @@ namespace SQL_Kayıt_Formu_Yeni
         private void label1_Click(object sender, EventArgs e)
         {
 
+        }
+
+        private void button3_Click_1(object sender, EventArgs e)
+        {
+
+        }
+
+
+
+        private void button3_Click_2(object sender, EventArgs e)
+        {
+            if (dataGridView1.SelectedRows.Count > 0)
+            {
+                long idToDelete = Convert.ToInt64(dataGridView1.SelectedRows[0].Cells["tc"].Value);
+                DeleteItemFromDatabase(idToDelete);
+                dataGridView1.Rows.RemoveAt(dataGridView1.SelectedRows[0].Index);
+            }
+            else
+            {
+                MessageBox.Show("Lütfen silinecek bir öğe seçin.");
+            }
+        }
+
+        private void DeleteItemFromDatabase(long tc)
+        {
+            string connectionString = "Data Source=DESKTOP-LATR9CC\\SQLEXPRESS;Initial Catalog=eyyubıxkayit;Integrated Security=True";
+            string Query = "DELETE FROM eyyubıxkayit.dbo.eyyubixkisiler WHERE tc = @tc";
+
+            using (SqlConnection connect = new SqlConnection(connectionString))
+            {
+                SqlCommand command = new SqlCommand(Query, connect);
+                command.Parameters.AddWithValue("@tc", tc);
+
+                try
+                {
+                    connect.Open();
+                    int rowsAffected = command.ExecuteNonQuery();
+
+                    if(rowsAffected > 0)
+                    {
+                        MessageBox.Show("Öğe başarıyla silindi.");
+                    }
+                    else
+                    {
+                        MessageBox.Show("Öğe bulunamadı.");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Hata: " + ex.Message);
+                }
+            }
         }
     }
 }
